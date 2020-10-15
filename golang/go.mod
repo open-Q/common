@@ -1,4 +1,4 @@
-module github.com/open-Q/common/go
+module github.com/open-Q/common/golang
 
 go 1.15
 
