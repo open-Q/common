@@ -44,7 +44,7 @@ func TestGenericFlag_Value(t *testing.T) {
 	for i := range tt {
 		tc := &tt[i]
 		t.Run(tc.name, func(t *testing.T) {
-			flag := NewGenericFlag(&tc.value)
+			flag := NewGenericFlag(tc.value)
 			require.Equal(t, tc.value, flag.Value())
 		})
 	}

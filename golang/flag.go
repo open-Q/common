@@ -41,9 +41,9 @@ func (gf *GenericFlag) Value() interface{} {
 }
 
 // NewGenericFlag returns new generic flag instance with the provided value.
-func NewGenericFlag(value *interface{}) GenericFlag {
+func NewGenericFlag(value interface{}) GenericFlag {
 	return GenericFlag{
-		v: value,
+		v: &value,
 	}
 }
 

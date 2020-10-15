@@ -3,12 +3,17 @@ package golang
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/micro/cli/v2"
 	micro "github.com/micro/go-micro/v2"
 	"github.com/pkg/errors"
+)
+
+const (
+	disableFlagCheckENV = "disable-flag-check"
 )
 
 // ServiceContract represents service contract configuration.
@@ -59,7 +64,7 @@ func (c *ServiceContract) Validate() error {
 // Validate validates service flag struct.
 func (sf *ServiceFlag) Validate() error {
 	if strings.TrimSpace(sf.Name) == "" {
-		return errors.New("name is required")
+		return errors.New("flag's name is required")
 	}
 
 	return nil
@@ -87,10 +92,21 @@ func NewService(contractPath string) (micro.Service, map[string]GenericFlag, err
 		micro.Flags(cliFlags...),
 	)
 
-	// init will parse the command line flags.
-	service.Init()
+	// parse the command line flags.
+	initService(service)
 
 	return service, flagsMap, nil
+}
+
+func initService(service micro.Service) {
+	_, ok := os.LookupEnv(disableFlagCheckENV)
+	if ok {
+		service.Options().Cmd.App().OnUsageError = func(context *cli.Context, err error, isSubcommand bool) error {
+			// skip flag parse errors.
+			return nil
+		}
+	}
+	service.Init()
 }
 
 func parseContractFile(fPath string) (*ServiceContract, error) {
@@ -109,9 +125,9 @@ func parseContractFile(fPath string) (*ServiceContract, error) {
 	return &contract, nil
 }
 
-func generateServiceFlags(flags []ServiceFlag) ([]cli.Flag, map[string]GenericFlag) {
-	cliFlags := make([]cli.Flag, 0, len(flags))
-	flagsMap := make(map[string]GenericFlag)
+func generateServiceFlags(flags []ServiceFlag) (cliFlags []cli.Flag, flagsMap map[string]GenericFlag) {
+	cliFlags = make([]cli.Flag, 0, len(flags))
+	flagsMap = make(map[string]GenericFlag)
 
 	for i := range flags {
 		var dest interface{}
@@ -123,9 +139,10 @@ func generateServiceFlags(flags []ServiceFlag) ([]cli.Flag, map[string]GenericFl
 		flagsMap[flags[i].Name] = NewGenericFlag(&dest)
 	}
 
-	return cliFlags, flagsMap
+	return
 }
 
+//nolint:gocritic // need to make destination assignable.
 func createFlag(flag ServiceFlag, destination *interface{}) (cliFlag cli.Flag) {
 	switch strings.ToLower(flag.Type) {
 	case boolFlag:
