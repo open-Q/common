@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package user;
+
+service User {
+	rpc Add(UserRequest) returns (UserResponse) {}
+}
+
+enum AccountStatus {
+    ACCOUNT_STATUS_ACTIVE = 0;
+    ACCOUNT_STATUS_BLOCKED = 1;
+    ACCOUNT_STATUS_DELETED = 2;
+}
+
+message UserRequest {
+	string email = 1;
+}
+
+message UserResponse {
+    string id = 1;
+    string email = 2;
+    AccountStatus status = 3;
+}

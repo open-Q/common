@@ -9,3 +9,6 @@ lint:
 
 todo:
 	grep -rn --exclude-dir=.git --exclude=Makefile --exclude-dir=.idea --exclude=TODO.md '// TODO' . > 'TODO.md'
+
+gen-protobuf:
+	protoc -I ${GOPATH}/src/github.com/open-Q/common/proto/ --micro_out=./proto/user --go_out=plugins=micro:./proto/user ${GOPATH}/src/github.com/open-Q/common/proto/user.proto
