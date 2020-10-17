@@ -2,6 +2,7 @@ package golang
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/micro/cli/v2"
 	micro "github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/server"
 	"github.com/pkg/errors"
 )
 
@@ -90,6 +92,12 @@ func NewService(contractPath string) (micro.Service, map[string]GenericFlag, err
 		micro.Version(contract.Version),
 		micro.Metadata(contract.Config.Meta),
 		micro.Flags(cliFlags...),
+		micro.Server(
+			server.NewServer(
+				server.Name(contract.Name),
+				server.Address(fmt.Sprintf("%s:%d", contract.Config.Host, contract.Config.Port)),
+			),
+		),
 	)
 
 	// parse the command line flags.

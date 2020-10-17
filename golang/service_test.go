@@ -495,6 +495,7 @@ func Test_NewService(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, service)
 		require.NotNil(t, flagsMap)
+		checkKey(t, flagsMap, "flag-name", "test value")
 	})
 }
 

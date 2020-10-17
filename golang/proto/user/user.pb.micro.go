@@ -42,7 +42,10 @@ func NewUserEndpoints() []*api.Endpoint {
 // Client API for User service
 
 type UserService interface {
-	Add(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error)
+	Create(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error)
+	Delete(ctx context.Context, in *UserID, opts ...client.CallOption) (*UserID, error)
+	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UserResponse, error)
+	Find(ctx context.Context, in *FindFilter, opts ...client.CallOption) (User_FindService, error)
 }
 
 type userService struct {
@@ -57,8 +60,8 @@ func NewUserService(name string, c client.Client) UserService {
 	}
 }
 
-func (c *userService) Add(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error) {
-	req := c.c.NewRequest(c.name, "User.Add", in)
+func (c *userService) Create(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.Create", in)
 	out := new(UserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -67,15 +70,90 @@ func (c *userService) Add(ctx context.Context, in *UserRequest, opts ...client.C
 	return out, nil
 }
 
+func (c *userService) Delete(ctx context.Context, in *UserID, opts ...client.CallOption) (*UserID, error) {
+	req := c.c.NewRequest(c.name, "User.Delete", in)
+	out := new(UserID)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.Update", in)
+	out := new(UserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) Find(ctx context.Context, in *FindFilter, opts ...client.CallOption) (User_FindService, error) {
+	req := c.c.NewRequest(c.name, "User.Find", &FindFilter{})
+	stream, err := c.c.Stream(ctx, req, opts...)
+	if err != nil {
+		return nil, err
+	}
+	if err := stream.Send(in); err != nil {
+		return nil, err
+	}
+	return &userServiceFind{stream}, nil
+}
+
+type User_FindService interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Recv() (*UserResponse, error)
+}
+
+type userServiceFind struct {
+	stream client.Stream
+}
+
+func (x *userServiceFind) Close() error {
+	return x.stream.Close()
+}
+
+func (x *userServiceFind) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *userServiceFind) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *userServiceFind) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *userServiceFind) Recv() (*UserResponse, error) {
+	m := new(UserResponse)
+	err := x.stream.Recv(m)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
-	Add(context.Context, *UserRequest, *UserResponse) error
+	Create(context.Context, *UserRequest, *UserResponse) error
+	Delete(context.Context, *UserID, *UserID) error
+	Update(context.Context, *UpdateRequest, *UserResponse) error
+	Find(context.Context, *FindFilter, User_FindStream) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
-		Add(ctx context.Context, in *UserRequest, out *UserResponse) error
+		Create(ctx context.Context, in *UserRequest, out *UserResponse) error
+		Delete(ctx context.Context, in *UserID, out *UserID) error
+		Update(ctx context.Context, in *UpdateRequest, out *UserResponse) error
+		Find(ctx context.Context, stream server.Stream) error
 	}
 	type User struct {
 		user
@@ -88,6 +166,54 @@ type userHandler struct {
 	UserHandler
 }
 
-func (h *userHandler) Add(ctx context.Context, in *UserRequest, out *UserResponse) error {
-	return h.UserHandler.Add(ctx, in, out)
+func (h *userHandler) Create(ctx context.Context, in *UserRequest, out *UserResponse) error {
+	return h.UserHandler.Create(ctx, in, out)
+}
+
+func (h *userHandler) Delete(ctx context.Context, in *UserID, out *UserID) error {
+	return h.UserHandler.Delete(ctx, in, out)
+}
+
+func (h *userHandler) Update(ctx context.Context, in *UpdateRequest, out *UserResponse) error {
+	return h.UserHandler.Update(ctx, in, out)
+}
+
+func (h *userHandler) Find(ctx context.Context, stream server.Stream) error {
+	m := new(FindFilter)
+	if err := stream.Recv(m); err != nil {
+		return err
+	}
+	return h.UserHandler.Find(ctx, m, &userFindStream{stream})
+}
+
+type User_FindStream interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Send(*UserResponse) error
+}
+
+type userFindStream struct {
+	stream server.Stream
+}
+
+func (x *userFindStream) Close() error {
+	return x.stream.Close()
+}
+
+func (x *userFindStream) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *userFindStream) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *userFindStream) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *userFindStream) Send(m *UserResponse) error {
+	return x.stream.Send(m)
 }

@@ -3,7 +3,10 @@ syntax = "proto3";
 package user;
 
 service User {
-	rpc Add(UserRequest) returns (UserResponse) {}
+    rpc Create(UserRequest) returns (UserResponse) {}
+    rpc Delete(UserID) returns(UserID) {}
+    rpc Update(UpdateRequest) returns (UserResponse) {}
+    rpc Find(FindFilter) returns (stream UserResponse) {}
 }
 
 enum AccountStatus {
@@ -17,7 +20,23 @@ message UserRequest {
 }
 
 message UserResponse {
-    string id = 1;
+    UserID id = 1;
     string email = 2;
     AccountStatus status = 3;
+}
+
+message UserID {
+    string id = 1;
+}
+
+message UpdateRequest {
+    UserID id = 1;
+    AccountStatus status = 2;
+}
+
+message FindFilter {
+    repeated string ids = 1;
+    repeated AccountStatus statuses = 2;
+    repeated string emails = 3;
+    int32 limit = 4;
 }
