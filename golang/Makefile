@@ -4,7 +4,7 @@ dep:
 	go get -u github.com/micro/protoc-gen-micro/v2
 
 test:
-	go test -p 1 -coverpkg=./... ./...
+	go test -p 1 -coverpkg=./...,./log/... ./... ./log/...
 
 lint:
 	golangci-lint cache clean
