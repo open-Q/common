@@ -1,4 +1,4 @@
-package golang
+package service
 
 import (
 	"testing"

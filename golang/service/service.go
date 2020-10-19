@@ -1,4 +1,4 @@
-package golang
+package service
 
 import (
 	"encoding/json"
@@ -18,24 +18,24 @@ const (
 	disableFlagCheckENV = "disable-flag-check"
 )
 
-// ServiceContract represents service contract configuration.
-type ServiceContract struct {
-	Name        string        `json:"service"`
-	Version     string        `json:"version,omitempty"`
-	Description string        `json:"description,omitempty"`
-	Config      ServiceConfig `json:"config"`
-	Flags       []ServiceFlag `json:"flags,omitempty"`
+// Contract represents service contract configuration.
+type Contract struct {
+	Name        string `json:"service"`
+	Version     string `json:"version,omitempty"`
+	Description string `json:"description,omitempty"`
+	Config      Config `json:"config"`
+	Flags       []Flag `json:"flags,omitempty"`
 }
 
-// ServiceConfig represents service configuration model.
-type ServiceConfig struct {
+// Config represents service configuration model.
+type Config struct {
 	Port int64             `json:"port"`
 	Host string            `json:"host"`
 	Meta map[string]string `json:"meta,omitempty"`
 }
 
-// ServiceFlag represents service flag model.
-type ServiceFlag struct {
+// Flag represents service flag model.
+type Flag struct {
 	Type     string      `json:"type,omitempty"`
 	Name     string      `json:"name"`
 	Value    interface{} `json:"value,omitempty"`
@@ -45,7 +45,7 @@ type ServiceFlag struct {
 }
 
 // Validate validates service contract struct.
-func (c *ServiceContract) Validate() error {
+func (c *Contract) Validate() error {
 	if strings.TrimSpace(c.Name) == "" {
 		return errors.New("service name is required")
 	}
@@ -64,7 +64,7 @@ func (c *ServiceContract) Validate() error {
 }
 
 // Validate validates service flag struct.
-func (sf *ServiceFlag) Validate() error {
+func (sf *Flag) Validate() error {
 	if strings.TrimSpace(sf.Name) == "" {
 		return errors.New("flag's name is required")
 	}
@@ -72,8 +72,8 @@ func (sf *ServiceFlag) Validate() error {
 	return nil
 }
 
-// NewService creates new micro.Service instance by contract configuration.
-func NewService(contractPath string) (micro.Service, map[string]GenericFlag, error) {
+// New creates new micro.Service instance by contract configuration.
+func New(contractPath string) (micro.Service, map[string]GenericFlag, error) {
 	// get service contract.
 	contract, err := parseContractFile(contractPath)
 	if err != nil {
@@ -117,7 +117,7 @@ func initService(service micro.Service) {
 	service.Init()
 }
 
-func parseContractFile(fPath string) (*ServiceContract, error) {
+func parseContractFile(fPath string) (*Contract, error) {
 	// read the file data.
 	data, err := ioutil.ReadFile(fPath)
 	if err != nil {
@@ -125,7 +125,7 @@ func parseContractFile(fPath string) (*ServiceContract, error) {
 	}
 
 	// unmarshal file data into the struct.
-	var contract ServiceContract
+	var contract Contract
 	if err := json.Unmarshal(data, &contract); err != nil {
 		return nil, errors.Wrap(err, "could not parse file")
 	}
@@ -133,7 +133,7 @@ func parseContractFile(fPath string) (*ServiceContract, error) {
 	return &contract, nil
 }
 
-func generateServiceFlags(flags []ServiceFlag) (cliFlags []cli.Flag, flagsMap map[string]GenericFlag) {
+func generateServiceFlags(flags []Flag) (cliFlags []cli.Flag, flagsMap map[string]GenericFlag) {
 	cliFlags = make([]cli.Flag, 0, len(flags))
 	flagsMap = make(map[string]GenericFlag)
 
@@ -151,7 +151,7 @@ func generateServiceFlags(flags []ServiceFlag) (cliFlags []cli.Flag, flagsMap ma
 }
 
 //nolint:gocritic // need to make destination assignable.
-func createFlag(flag ServiceFlag, destination *interface{}) (cliFlag cli.Flag) {
+func createFlag(flag Flag, destination *interface{}) (cliFlag cli.Flag) {
 	switch strings.ToLower(flag.Type) {
 	case boolFlag:
 		var dest bool

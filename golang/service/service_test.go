@@ -1,4 +1,4 @@
-package golang
+package service
 
 import (
 	"encoding/json"
@@ -18,11 +18,11 @@ func Test_generateServiceFlags(t *testing.T) {
 	tNow := time.Now()
 	tt := []struct {
 		name  string
-		flags []ServiceFlag
+		flags []Flag
 	}{
 		{
 			name: "bool flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "bool",
 					Name:  "bool-flag-with-true",
@@ -37,7 +37,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "duration flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "duration",
 					Name:  "duration-flag-with-25ms",
@@ -52,7 +52,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "float64 flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "float64",
 					Name:  "float64-flag-with-positive",
@@ -67,7 +67,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "int64 flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "int64",
 					Name:  "int64-flag-with-positive",
@@ -82,7 +82,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "int flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "int",
 					Name:  "int-flag-with-positive",
@@ -97,7 +97,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "string flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "string",
 					Name:  "string-flag-with-empty",
@@ -112,7 +112,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "uint64 flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "uint64",
 					Name:  "uint64-flag-with-zero",
@@ -127,7 +127,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "uint flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "uint",
 					Name:  "uint-flag-with-zero",
@@ -142,7 +142,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "int slice flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "slice:int",
 					Name:  "slice:int-flag-with-empty",
@@ -157,7 +157,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "int64 slice flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "slice:int64",
 					Name:  "slice:int64-flag-with-empty",
@@ -172,7 +172,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "float64 slice flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "slice:float64",
 					Name:  "slice:float64-flag-with-empty",
@@ -187,7 +187,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "string slice flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "slice:string",
 					Name:  "slice:string-flag-with-empty",
@@ -202,7 +202,7 @@ func Test_generateServiceFlags(t *testing.T) {
 		},
 		{
 			name: "all possible flags",
-			flags: []ServiceFlag{
+			flags: []Flag{
 				{
 					Type:  "bool",
 					Name:  "bool-flag",
@@ -283,7 +283,7 @@ func Test_generateServiceFlags(t *testing.T) {
 	}
 
 	t.Run("invalid flag type", func(t *testing.T) {
-		flags := []ServiceFlag{
+		flags := []Flag{
 			{
 				Type:  "invalid",
 				Name:  "invalid-flag",
@@ -306,43 +306,43 @@ func Test_generateServiceFlags(t *testing.T) {
 	})
 }
 
-func TestServiceContract_Validate(t *testing.T) {
+func TestContract_Validate(t *testing.T) {
 	tt := []struct {
 		name     string
-		contract ServiceContract
+		contract Contract
 		expErr   error
 	}{
 		{
 			name:     "service name is required error",
-			contract: ServiceContract{},
+			contract: Contract{},
 			expErr:   errors.New("service name is required"),
 		},
 		{
 			name: "service host is required error",
-			contract: ServiceContract{
+			contract: Contract{
 				Name: "test",
 			},
 			expErr: errors.New("service host is required"),
 		},
 		{
 			name: "flags validation error",
-			contract: ServiceContract{
+			contract: Contract{
 				Name: "test",
-				Config: ServiceConfig{
+				Config: Config{
 					Host: "127.0.0.1",
 				},
-				Flags: []ServiceFlag{{}},
+				Flags: []Flag{{}},
 			},
 			expErr: errors.New("flag's name is required"),
 		},
 		{
 			name: "all ok",
-			contract: ServiceContract{
+			contract: Contract{
 				Name: "test",
-				Config: ServiceConfig{
+				Config: Config{
 					Host: "127.0.0.1",
 				},
-				Flags: []ServiceFlag{
+				Flags: []Flag{
 					{
 						Name: "test-flag",
 					},
@@ -364,15 +364,15 @@ func TestServiceContract_Validate(t *testing.T) {
 	}
 }
 
-func TestServiceFlag_Validate(t *testing.T) {
+func TestFlag_Validate(t *testing.T) {
 	t.Run("flag's name is required error", func(t *testing.T) {
-		f := ServiceFlag{}
+		f := Flag{}
 		err := f.Validate()
 		require.Error(t, err)
 		require.EqualError(t, err, errors.New("flag's name is required").Error())
 	})
 	t.Run("all ok", func(t *testing.T) {
-		f := ServiceFlag{
+		f := Flag{
 			Name: "test-flag",
 		}
 		err := f.Validate()
@@ -399,16 +399,16 @@ func Test_parseContractFile(t *testing.T) {
 		require.EqualError(t, err, errors.Wrap(errors.New("invalid character 'i' looking for beginning of value"), "could not parse file").Error())
 	})
 	t.Run("all ok", func(t *testing.T) {
-		contract := ServiceContract{
+		contract := Contract{
 			Description: "some description",
-			Config: ServiceConfig{
+			Config: Config{
 				Port: 9000,
 				Host: "127.0.0.1",
 				Meta: map[string]string{
 					"key": "value",
 				},
 			},
-			Flags: []ServiceFlag{
+			Flags: []Flag{
 				{
 					Name:     "flag-name",
 					Aliases:  []string{"fname", "fn"},
@@ -436,14 +436,14 @@ func Test_parseContractFile(t *testing.T) {
 	})
 }
 
-func Test_NewService(t *testing.T) {
+func Test_New(t *testing.T) {
 	t.Run("parse file error", func(t *testing.T) {
-		_, _, err := NewService("nonexists")
+		_, _, err := New("nonexists")
 		require.Error(t, err)
 		require.EqualError(t, err, errors.Wrap(errors.New("could not read nonexists file data: open nonexists: no such file or directory"), "contract error").Error())
 	})
 	t.Run("validate contract error", func(t *testing.T) {
-		contract := ServiceContract{}
+		contract := Contract{}
 		data, err := json.Marshal(contract)
 		require.NoError(t, err)
 		fPath := path.Join(os.TempDir(), "temp.json")
@@ -453,21 +453,21 @@ func Test_NewService(t *testing.T) {
 			err := os.Remove(fPath)
 			require.NoError(t, err)
 		}()
-		_, _, err = NewService(fPath)
+		_, _, err = New(fPath)
 		require.Error(t, err)
 		require.EqualError(t, err, errors.Wrap(errors.New("service name is required"), "validation error").Error())
 	})
 	t.Run("all ok", func(t *testing.T) {
-		contract := ServiceContract{
+		contract := Contract{
 			Description: "some description",
-			Config: ServiceConfig{
+			Config: Config{
 				Port: 9000,
 				Host: "127.0.0.1",
 				Meta: map[string]string{
 					"key": "value",
 				},
 			},
-			Flags: []ServiceFlag{
+			Flags: []Flag{
 				{
 					Name:     "flag-name",
 					Aliases:  []string{"fname", "fn"},
@@ -491,7 +491,7 @@ func Test_NewService(t *testing.T) {
 		}()
 		err = os.Setenv(disableFlagCheckENV, "true")
 		require.NoError(t, err)
-		service, flagsMap, err := NewService(fPath)
+		service, flagsMap, err := New(fPath)
 		require.NoError(t, err)
 		require.NotNil(t, service)
 		require.NotNil(t, flagsMap)

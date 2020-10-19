@@ -1,4 +1,4 @@
-package golang
+package service
 
 import (
 	"reflect"
@@ -47,7 +47,7 @@ func NewGenericFlag(value interface{}) GenericFlag {
 	}
 }
 
-func newBoolFlagCli(flag ServiceFlag, destination *bool) *cli.BoolFlag {
+func newBoolFlagCli(flag Flag, destination *bool) *cli.BoolFlag {
 	return &cli.BoolFlag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -58,7 +58,7 @@ func newBoolFlagCli(flag ServiceFlag, destination *bool) *cli.BoolFlag {
 	}
 }
 
-func newDurationFlagCli(flag ServiceFlag, destination *time.Duration) *cli.DurationFlag {
+func newDurationFlagCli(flag Flag, destination *time.Duration) *cli.DurationFlag {
 	return &cli.DurationFlag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -69,7 +69,7 @@ func newDurationFlagCli(flag ServiceFlag, destination *time.Duration) *cli.Durat
 	}
 }
 
-func newFloat64FlagCli(flag ServiceFlag, destination *float64) *cli.Float64Flag {
+func newFloat64FlagCli(flag Flag, destination *float64) *cli.Float64Flag {
 	return &cli.Float64Flag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -80,7 +80,7 @@ func newFloat64FlagCli(flag ServiceFlag, destination *float64) *cli.Float64Flag 
 	}
 }
 
-func newInt64FlagCli(flag ServiceFlag, destination *int64) *cli.Int64Flag {
+func newInt64FlagCli(flag Flag, destination *int64) *cli.Int64Flag {
 	return &cli.Int64Flag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -91,7 +91,7 @@ func newInt64FlagCli(flag ServiceFlag, destination *int64) *cli.Int64Flag {
 	}
 }
 
-func newIntFlagCli(flag ServiceFlag, destination *int) *cli.IntFlag {
+func newIntFlagCli(flag Flag, destination *int) *cli.IntFlag {
 	return &cli.IntFlag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -102,7 +102,7 @@ func newIntFlagCli(flag ServiceFlag, destination *int) *cli.IntFlag {
 	}
 }
 
-func newStringFlagCli(flag ServiceFlag, destination *string) *cli.StringFlag {
+func newStringFlagCli(flag Flag, destination *string) *cli.StringFlag {
 	return &cli.StringFlag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -113,7 +113,7 @@ func newStringFlagCli(flag ServiceFlag, destination *string) *cli.StringFlag {
 	}
 }
 
-func newUint64FlagCli(flag ServiceFlag, destination *uint64) *cli.Uint64Flag {
+func newUint64FlagCli(flag Flag, destination *uint64) *cli.Uint64Flag {
 	return &cli.Uint64Flag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -124,7 +124,7 @@ func newUint64FlagCli(flag ServiceFlag, destination *uint64) *cli.Uint64Flag {
 	}
 }
 
-func newUintFlagCli(flag ServiceFlag, destination *uint) *cli.UintFlag {
+func newUintFlagCli(flag Flag, destination *uint) *cli.UintFlag {
 	return &cli.UintFlag{
 		Destination: destination,
 		Name:        flag.Name,
@@ -135,7 +135,7 @@ func newUintFlagCli(flag ServiceFlag, destination *uint) *cli.UintFlag {
 	}
 }
 
-func newIntSliceFlagCli(flag ServiceFlag, destination []int) *cli.IntSliceFlag {
+func newIntSliceFlagCli(flag Flag, destination []int) *cli.IntSliceFlag {
 	return &cli.IntSliceFlag{
 		Value:    cli.NewIntSlice(destination...),
 		Name:     flag.Name,
@@ -145,7 +145,7 @@ func newIntSliceFlagCli(flag ServiceFlag, destination []int) *cli.IntSliceFlag {
 	}
 }
 
-func newInt64SliceFlagCli(flag ServiceFlag, destination []int64) *cli.Int64SliceFlag {
+func newInt64SliceFlagCli(flag Flag, destination []int64) *cli.Int64SliceFlag {
 	return &cli.Int64SliceFlag{
 		Value:    cli.NewInt64Slice(destination...),
 		Name:     flag.Name,
@@ -155,7 +155,7 @@ func newInt64SliceFlagCli(flag ServiceFlag, destination []int64) *cli.Int64Slice
 	}
 }
 
-func newFloat64SliceFlagCli(flag ServiceFlag, destination []float64) *cli.Float64SliceFlag {
+func newFloat64SliceFlagCli(flag Flag, destination []float64) *cli.Float64SliceFlag {
 	return &cli.Float64SliceFlag{
 		Value:    cli.NewFloat64Slice(destination...),
 		Name:     flag.Name,
@@ -165,7 +165,7 @@ func newFloat64SliceFlagCli(flag ServiceFlag, destination []float64) *cli.Float6
 	}
 }
 
-func newStringSliceFlagCli(flag ServiceFlag, destination []string) *cli.StringSliceFlag {
+func newStringSliceFlagCli(flag Flag, destination []string) *cli.StringSliceFlag {
 	return &cli.StringSliceFlag{
 		Value:    cli.NewStringSlice(destination...),
 		Name:     flag.Name,
