@@ -17,8 +17,10 @@ import (
 func Test_generateServiceFlags(t *testing.T) {
 	tNow := time.Now()
 	tt := []struct {
-		name  string
-		flags []Flag
+		name     string
+		flags    []Flag
+		prepare  func()
+		expValue func(flag *Flag) interface{}
 	}{
 		{
 			name: "bool flags",
@@ -201,6 +203,33 @@ func Test_generateServiceFlags(t *testing.T) {
 			},
 		},
 		{
+			name: "flags form env",
+			flags: []Flag{
+				{
+					Type:         "string",
+					Name:         "string-env",
+					EnvVariables: []string{"env1"},
+				},
+				{
+					Type:         "float64",
+					Name:         "float64-env",
+					EnvVariables: []string{"env2"},
+				},
+			},
+			prepare: func() {
+				err := os.Setenv("env1", "hello")
+				require.NoError(t, err)
+				err = os.Setenv("env2", "325.677")
+				require.NoError(t, err)
+			},
+			expValue: func(f *Flag) interface{} {
+				if f.Name == "string-env" {
+					return "hello"
+				}
+				return float64(325.677)
+			},
+		},
+		{
 			name: "all possible flags",
 			flags: []Flag{
 				{
@@ -269,6 +298,9 @@ func Test_generateServiceFlags(t *testing.T) {
 	for i := range tt {
 		tc := &tt[i]
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.prepare != nil {
+				tc.prepare()
+			}
 			cliFlags, flagsMap := generateServiceFlags(tc.flags)
 			require.NotNil(t, cliFlags)
 			require.NotNil(t, flagsMap)
@@ -277,7 +309,11 @@ func Test_generateServiceFlags(t *testing.T) {
 			require.Equal(t, len(tc.flags), len(cliFlags))
 			require.Equal(t, len(tc.flags), len(flagsMap))
 			for i := range tc.flags {
-				checkKey(t, flagsMap, tc.flags[i].Name, tc.flags[i].Value)
+				val := tc.flags[i].Value
+				if tc.expValue != nil {
+					val = tc.expValue(&tc.flags[i])
+				}
+				checkKey(t, flagsMap, tc.flags[i].Name, val)
 			}
 		})
 	}

@@ -48,91 +48,123 @@ func NewGenericFlag(value interface{}) GenericFlag {
 }
 
 func newBoolFlagCli(flag Flag, destination *bool) *cli.BoolFlag {
-	return &cli.BoolFlag{
+	f := cli.BoolFlag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(bool),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(bool)
+	}
+	return &f
 }
 
 func newDurationFlagCli(flag Flag, destination *time.Duration) *cli.DurationFlag {
-	return &cli.DurationFlag{
+	f := cli.DurationFlag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(time.Duration),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(time.Duration)
+	}
+	return &f
 }
 
 func newFloat64FlagCli(flag Flag, destination *float64) *cli.Float64Flag {
-	return &cli.Float64Flag{
+	f := cli.Float64Flag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(float64),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(float64)
+	}
+	return &f
 }
 
 func newInt64FlagCli(flag Flag, destination *int64) *cli.Int64Flag {
-	return &cli.Int64Flag{
+	f := cli.Int64Flag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(int64),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(int64)
+	}
+	return &f
 }
 
 func newIntFlagCli(flag Flag, destination *int) *cli.IntFlag {
-	return &cli.IntFlag{
+	f := cli.IntFlag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(int),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(int)
+	}
+	return &f
 }
 
 func newStringFlagCli(flag Flag, destination *string) *cli.StringFlag {
-	return &cli.StringFlag{
+	f := cli.StringFlag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(string),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(string)
+	}
+	return &f
 }
 
 func newUint64FlagCli(flag Flag, destination *uint64) *cli.Uint64Flag {
-	return &cli.Uint64Flag{
+	f := cli.Uint64Flag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(uint64),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(uint64)
+	}
+	return &f
 }
 
 func newUintFlagCli(flag Flag, destination *uint) *cli.UintFlag {
-	return &cli.UintFlag{
+	f := cli.UintFlag{
 		Destination: destination,
 		Name:        flag.Name,
 		Usage:       flag.Usage,
-		Value:       flag.Value.(uint),
 		Aliases:     flag.Aliases,
 		Required:    flag.Required,
+		EnvVars:     flag.EnvVariables,
 	}
+	if flag.Value != nil {
+		f.Value = flag.Value.(uint)
+	}
+	return &f
 }
 
 func newIntSliceFlagCli(flag Flag, destination []int) *cli.IntSliceFlag {
@@ -142,6 +174,7 @@ func newIntSliceFlagCli(flag Flag, destination []int) *cli.IntSliceFlag {
 		Usage:    flag.Usage,
 		Aliases:  flag.Aliases,
 		Required: flag.Required,
+		EnvVars:  flag.EnvVariables,
 	}
 }
 
@@ -152,6 +185,7 @@ func newInt64SliceFlagCli(flag Flag, destination []int64) *cli.Int64SliceFlag {
 		Usage:    flag.Usage,
 		Aliases:  flag.Aliases,
 		Required: flag.Required,
+		EnvVars:  flag.EnvVariables,
 	}
 }
 
@@ -162,6 +196,7 @@ func newFloat64SliceFlagCli(flag Flag, destination []float64) *cli.Float64SliceF
 		Usage:    flag.Usage,
 		Aliases:  flag.Aliases,
 		Required: flag.Required,
+		EnvVars:  flag.EnvVariables,
 	}
 }
 
@@ -172,5 +207,6 @@ func newStringSliceFlagCli(flag Flag, destination []string) *cli.StringSliceFlag
 		Usage:    flag.Usage,
 		Aliases:  flag.Aliases,
 		Required: flag.Required,
+		EnvVars:  flag.EnvVariables,
 	}
 }

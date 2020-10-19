@@ -36,12 +36,13 @@ type Config struct {
 
 // Flag represents service flag model.
 type Flag struct {
-	Type     string      `json:"type,omitempty"`
-	Name     string      `json:"name"`
-	Value    interface{} `json:"value,omitempty"`
-	Usage    string      `json:"usage,omitempty"`
-	Aliases  []string    `json:"aliases,omitempty"`
-	Required bool        `json:"required,omitempty"`
+	Type         string      `json:"type,omitempty"`
+	Name         string      `json:"name"`
+	Value        interface{} `json:"value,omitempty"`
+	Usage        string      `json:"usage,omitempty"`
+	Aliases      []string    `json:"aliases,omitempty"`
+	Required     bool        `json:"required,omitempty"`
+	EnvVariables []string    `json:"env,omitempty"`
 }
 
 // Validate validates service contract struct.
