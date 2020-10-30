@@ -4,9 +4,7 @@ dep:
 	go get -u github.com/micro/protoc-gen-micro/v2
 
 test:
-	make start_images
 	go test -p 1 -coverpkg=./log/...,./service/...,./storage/... ./log/... ./service/... ./storage/...
-	make stop_images
 
 lint:
 	golangci-lint cache clean

@@ -6,6 +6,7 @@ package user
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	_ "github.com/golang/protobuf/ptypes/any"
 	math "math"
 )
 
@@ -42,10 +43,10 @@ func NewUserEndpoints() []*api.Endpoint {
 // Client API for User service
 
 type UserService interface {
-	Create(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error)
-	Delete(ctx context.Context, in *UserID, opts ...client.CallOption) (*UserID, error)
-	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UserResponse, error)
+	Create(ctx context.Context, in *CreateRequest, opts ...client.CallOption) (*UserResponse, error)
 	Find(ctx context.Context, in *FindFilter, opts ...client.CallOption) (User_FindService, error)
+	Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*UserResponse, error)
+	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UserResponse, error)
 }
 
 type userService struct {
@@ -60,28 +61,8 @@ func NewUserService(name string, c client.Client) UserService {
 	}
 }
 
-func (c *userService) Create(ctx context.Context, in *UserRequest, opts ...client.CallOption) (*UserResponse, error) {
+func (c *userService) Create(ctx context.Context, in *CreateRequest, opts ...client.CallOption) (*UserResponse, error) {
 	req := c.c.NewRequest(c.name, "User.Create", in)
-	out := new(UserResponse)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userService) Delete(ctx context.Context, in *UserID, opts ...client.CallOption) (*UserID, error) {
-	req := c.c.NewRequest(c.name, "User.Delete", in)
-	out := new(UserID)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userService) Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UserResponse, error) {
-	req := c.c.NewRequest(c.name, "User.Update", in)
 	out := new(UserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -139,21 +120,41 @@ func (x *userServiceFind) Recv() (*UserResponse, error) {
 	return m, nil
 }
 
+func (c *userService) Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*UserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.Delete", in)
+	out := new(UserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.Update", in)
+	out := new(UserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
-	Create(context.Context, *UserRequest, *UserResponse) error
-	Delete(context.Context, *UserID, *UserID) error
-	Update(context.Context, *UpdateRequest, *UserResponse) error
+	Create(context.Context, *CreateRequest, *UserResponse) error
 	Find(context.Context, *FindFilter, User_FindStream) error
+	Delete(context.Context, *DeleteRequest, *UserResponse) error
+	Update(context.Context, *UpdateRequest, *UserResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
-		Create(ctx context.Context, in *UserRequest, out *UserResponse) error
-		Delete(ctx context.Context, in *UserID, out *UserID) error
-		Update(ctx context.Context, in *UpdateRequest, out *UserResponse) error
+		Create(ctx context.Context, in *CreateRequest, out *UserResponse) error
 		Find(ctx context.Context, stream server.Stream) error
+		Delete(ctx context.Context, in *DeleteRequest, out *UserResponse) error
+		Update(ctx context.Context, in *UpdateRequest, out *UserResponse) error
 	}
 	type User struct {
 		user
@@ -166,16 +167,8 @@ type userHandler struct {
 	UserHandler
 }
 
-func (h *userHandler) Create(ctx context.Context, in *UserRequest, out *UserResponse) error {
+func (h *userHandler) Create(ctx context.Context, in *CreateRequest, out *UserResponse) error {
 	return h.UserHandler.Create(ctx, in, out)
-}
-
-func (h *userHandler) Delete(ctx context.Context, in *UserID, out *UserID) error {
-	return h.UserHandler.Delete(ctx, in, out)
-}
-
-func (h *userHandler) Update(ctx context.Context, in *UpdateRequest, out *UserResponse) error {
-	return h.UserHandler.Update(ctx, in, out)
 }
 
 func (h *userHandler) Find(ctx context.Context, stream server.Stream) error {
@@ -216,4 +209,12 @@ func (x *userFindStream) RecvMsg(m interface{}) error {
 
 func (x *userFindStream) Send(m *UserResponse) error {
 	return x.stream.Send(m)
+}
+
+func (h *userHandler) Delete(ctx context.Context, in *DeleteRequest, out *UserResponse) error {
+	return h.UserHandler.Delete(ctx, in, out)
+}
+
+func (h *userHandler) Update(ctx context.Context, in *UpdateRequest, out *UserResponse) error {
+	return h.UserHandler.Update(ctx, in, out)
 }
