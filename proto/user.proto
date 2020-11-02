@@ -42,7 +42,7 @@ message UserResponse {
 message FindFilter {
     repeated string ids = 1;
     repeated AccountStatus statuses = 2;
-    google.protobuf.Struct metaPatterns = 3;
+    map<string, string> metaPatterns = 3;
     int64 limit = 4;
     int64 offset = 5;
 }
