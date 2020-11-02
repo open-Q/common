@@ -5,7 +5,7 @@ syntax = "proto3";
 
 package user;
 
-import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 
 // `User` represents grpc service for communicating with `user` microservice.
@@ -28,27 +28,21 @@ enum AccountStatus {
 
 // `CreateRequest` represents request message to create a new user.
 message CreateRequest {
-	repeated UserMeta meta = 1;
-}
-
-// `UserMeta` represents user meta data model. 
-message UserMeta {
-    string key = 1;
-    google.protobuf.Any value = 2;
+	google.protobuf.Struct meta = 1;
 }
 
 // `UserResponse` represents user response model.
 message UserResponse {
     string id = 1;
     AccountStatus status = 2;
-    repeated UserMeta meta = 3;
+    google.protobuf.Struct meta = 3;
 }
 
 // `FindFilter` represents filter model for finding users.
 message FindFilter {
     repeated string ids = 1;
     repeated AccountStatus statuses = 2;
-    repeated UserMeta metaPatterns = 3;
+    google.protobuf.Struct metaPatterns = 3;
     int64 limit = 4;
     int64 offset = 5;
 }
@@ -62,5 +56,5 @@ message DeleteRequest {
 message UpdateRequest {
     string id = 1;
     AccountStatus status = 2;
-    repeated UserMeta metaFields = 3;
+    google.protobuf.Struct metaFields = 3;
 }
