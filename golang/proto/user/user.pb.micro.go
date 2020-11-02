@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	_ "github.com/golang/protobuf/ptypes/any"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	math "math"
 )
 
@@ -45,7 +46,8 @@ func NewUserEndpoints() []*api.Endpoint {
 type UserService interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...client.CallOption) (*UserResponse, error)
 	Find(ctx context.Context, in *FindFilter, opts ...client.CallOption) (User_FindService, error)
-	Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*UserResponse, error)
+	FindOne(ctx context.Context, in *FindFilter, opts ...client.CallOption) (*UserResponse, error)
+	Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*empty.Empty, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UserResponse, error)
 }
 
@@ -120,9 +122,19 @@ func (x *userServiceFind) Recv() (*UserResponse, error) {
 	return m, nil
 }
 
-func (c *userService) Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*UserResponse, error) {
-	req := c.c.NewRequest(c.name, "User.Delete", in)
+func (c *userService) FindOne(ctx context.Context, in *FindFilter, opts ...client.CallOption) (*UserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.FindOne", in)
 	out := new(UserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*empty.Empty, error) {
+	req := c.c.NewRequest(c.name, "User.Delete", in)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -145,7 +157,8 @@ func (c *userService) Update(ctx context.Context, in *UpdateRequest, opts ...cli
 type UserHandler interface {
 	Create(context.Context, *CreateRequest, *UserResponse) error
 	Find(context.Context, *FindFilter, User_FindStream) error
-	Delete(context.Context, *DeleteRequest, *UserResponse) error
+	FindOne(context.Context, *FindFilter, *UserResponse) error
+	Delete(context.Context, *DeleteRequest, *empty.Empty) error
 	Update(context.Context, *UpdateRequest, *UserResponse) error
 }
 
@@ -153,7 +166,8 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 	type user interface {
 		Create(ctx context.Context, in *CreateRequest, out *UserResponse) error
 		Find(ctx context.Context, stream server.Stream) error
-		Delete(ctx context.Context, in *DeleteRequest, out *UserResponse) error
+		FindOne(ctx context.Context, in *FindFilter, out *UserResponse) error
+		Delete(ctx context.Context, in *DeleteRequest, out *empty.Empty) error
 		Update(ctx context.Context, in *UpdateRequest, out *UserResponse) error
 	}
 	type User struct {
@@ -211,7 +225,11 @@ func (x *userFindStream) Send(m *UserResponse) error {
 	return x.stream.Send(m)
 }
 
-func (h *userHandler) Delete(ctx context.Context, in *DeleteRequest, out *UserResponse) error {
+func (h *userHandler) FindOne(ctx context.Context, in *FindFilter, out *UserResponse) error {
+	return h.UserHandler.FindOne(ctx, in, out)
+}
+
+func (h *userHandler) Delete(ctx context.Context, in *DeleteRequest, out *empty.Empty) error {
 	return h.UserHandler.Delete(ctx, in, out)
 }
 
